@@ -1,5 +1,3 @@
-//! Example showing how to have multiple passes
-
 use bevy::{prelude::*, render::render_resource::ShaderRef};
 use bevy_app_compute::prelude::*;
 
