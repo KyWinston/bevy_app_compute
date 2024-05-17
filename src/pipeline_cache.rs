@@ -8,7 +8,6 @@ use std::borrow::Cow;
 use std::iter::FusedIterator;
 use std::mem;
 
-
 use bevy::prelude::*;
 use bevy::render::render_resource::{
     BindGroupLayout, BindGroupLayoutId, CachedPipelineState, ComputePipeline,
@@ -19,8 +18,6 @@ use bevy::render::renderer::RenderDevice;
 use bevy::utils::{Entry, HashMap, HashSet};
 use naga::valid::Capabilities;
 use parking_lot::Mutex;
-#[cfg(feature = "shader_format_spirv")]
-use wgpu::util::make_spirv;
 use wgpu::{
     Features, PipelineLayout, PipelineLayoutDescriptor, PushConstantRange, ShaderModuleDescriptor,
 };
@@ -67,19 +64,19 @@ impl ShaderCache {
             (Features::PUSH_CONSTANTS, Capabilities::PUSH_CONSTANT),
             (Features::SHADER_F64, Capabilities::FLOAT64),
             (
-                Features::SHADER_PRIMITIVE_INDEX,
+                wgpu::Features::SHADER_PRIMITIVE_INDEX,
                 Capabilities::PRIMITIVE_INDEX,
             ),
             (
-                Features::SAMPLED_TEXTURE_AND_STORAGE_BUFFER_ARRAY_NON_UNIFORM_INDEXING,
+                wgpu::Features::SAMPLED_TEXTURE_AND_STORAGE_BUFFER_ARRAY_NON_UNIFORM_INDEXING,
                 Capabilities::SAMPLED_TEXTURE_AND_STORAGE_BUFFER_ARRAY_NON_UNIFORM_INDEXING,
             ),
             (
-                Features::SAMPLED_TEXTURE_AND_STORAGE_BUFFER_ARRAY_NON_UNIFORM_INDEXING,
+                wgpu::Features::SAMPLED_TEXTURE_AND_STORAGE_BUFFER_ARRAY_NON_UNIFORM_INDEXING,
                 Capabilities::SAMPLER_NON_UNIFORM_INDEXING,
             ),
             (
-                Features::UNIFORM_BUFFER_AND_STORAGE_TEXTURE_ARRAY_NON_UNIFORM_INDEXING,
+                wgpu::Features::UNIFORM_BUFFER_AND_STORAGE_TEXTURE_ARRAY_NON_UNIFORM_INDEXING,
                 Capabilities::UNIFORM_BUFFER_AND_STORAGE_TEXTURE_ARRAY_NON_UNIFORM_INDEXING,
             ),
         ];
@@ -485,7 +482,9 @@ impl AppPipelineCache {
     }
 
     pub fn set_shader(&mut self, shader_asset_id: &AssetId<Shader>, shader: &Shader) {
-        let pipelines_to_queue = self.shader_cache.set_shader(shader_asset_id, shader.clone());
+        let pipelines_to_queue = self
+            .shader_cache
+            .set_shader(shader_asset_id, shader.clone());
         for cached_pipeline in pipelines_to_queue {
             self.pipelines[cached_pipeline.0].state = CachedPipelineState::Queued;
             self.waiting_pipelines.insert(cached_pipeline);
