@@ -4,7 +4,6 @@
 [![Doc](https://docs.rs/bevy_app_compute/badge.svg)](https://docs.rs/bevy_app_compute)
 [![Crate](https://img.shields.io/crates/v/bevy_app_compute.svg)](https://crates.io/crates/bevy_app_compute)
 
-
 Dispatch and run compute shaders on bevy from App World .
 
 ## Getting Started
@@ -13,7 +12,7 @@ Add the following line to your `Cargo.toml`
 
 ```toml
 [dependencies]
-bevy_app_compute = "0.10.3"
+bevy_app_compute = "0.13.0"
 ```
 
 ## Usage
@@ -21,11 +20,10 @@ bevy_app_compute = "0.10.3"
 ### Setup
 
 Declare your shaders in structs implementing `ComputeShader`. The `shader()` fn should point to your shader source code.
-You need to derive `TypeUuid` as well and assign a unique Uuid:
+You need to derive `TypePath` as well
 
 ```rust
-#[derive(TypeUuid)]
-#[uuid = "2545ae14-a9bc-4f03-9ea4-4eb43d1075a7"]
+#[derive(TypePath)]
 struct SimpleShader;
 
 impl ComputeShader for SimpleShader {
@@ -121,9 +119,9 @@ let worker = AppComputeWorkerBuilder::new(world)
     .add_storage("input", &[1., 2., 3., 4.])
     .add_staging("output", &[0f32; 4])
     // add each item + `value` from `input` to `output`
-    .add_pass::<FirstPassShader>([4, 1, 1], &["value", "input", "output"]) 
+    .add_pass::<FirstPassShader>([4, 1, 1], &["value", "input", "output"])
     // multiply each element of `output` by itself
-    .add_pass::<SecondPassShader>([4, 1, 1], &["output"]) 
+    .add_pass::<SecondPassShader>([4, 1, 1], &["output"])
     .build();
 
     // the `output` buffer will contain [16.0, 25.0, 36.0, 49.0]
@@ -153,24 +151,22 @@ Then, you can call `execute()` on your worker when you are ready to execute it:
 ```rust
 // Execute it only when the left mouse button is pressed.
 fn on_click_compute(
-    buttons: Res<Input<MouseButton>>,
+    buttons: Res<ButtonInput<MouseButton>>,
     mut compute_worker: ResMut<AppComputeWorker<SimpleComputeWorker>>
 ) {
     if !buttons.just_pressed(MouseButton::Left) { return; }
 
     compute_worker.execute();
-} 
+}
 ```
 
 It will run at the end of the current frame, and you'll be able to read the data in the next frame.
 
 (see [one_shot.rs](https://github.com/kjolnyr/bevy_app_compute/tree/dev/examples/one_shot.rs))
 
-
 ## Examples
 
 See [examples](https://github.com/kjolnyr/bevy_app_compute/tree/main/examples)
-
 
 ## Features being worked upon
 
@@ -181,8 +177,9 @@ See [examples](https://github.com/kjolnyr/bevy_app_compute/tree/main/examples)
 
 ## Bevy version mapping
 
-|Bevy|bevy_app_compute|
-|---|---|
-|main|main|
-|0.10|0.10.3|
-|0.12|0.10.5|
+| Bevy | bevy_app_compute |
+| ---- | ---------------- |
+| main | main             |
+| 0.10 | 0.10.3           |
+| 0.12 | 0.10.5           |
+| 0.13 | 0.13.0           |
