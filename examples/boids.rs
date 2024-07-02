@@ -2,17 +2,17 @@
 //! For now they are stupid and just fly straight, need to fix this later on.
 //! Reimplementation of https://github.com/gfx-rs/wgpu-rs/blob/master/examples/boids/main.rs
 
+use bevy::color::palettes::css::{ANTIQUE_WHITE, DARK_GRAY, ORANGE_RED};
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 
 use bevy::{
-    core::Pod,
     prelude::*,
     sprite::{MaterialMesh2dBundle, Mesh2dHandle},
     window::PrimaryWindow,
 };
 
 use bevy_app_compute::prelude::*;
-use bytemuck::Zeroable;
+use bytemuck::{Pod, Zeroable};
 
 use rand::distributions::{Distribution, Uniform};
 
@@ -99,10 +99,10 @@ fn main() {
         .add_plugins(FrameTimeDiagnosticsPlugin::default())
         .add_plugins(AppComputePlugin)
         .add_plugins(AppComputeWorkerPlugin::<BoidWorker>::default())
-        .insert_resource(ClearColor(Color::DARK_GRAY))
+        .insert_resource(ClearColor(DARK_GRAY.into()))
         .add_systems(Startup, setup)
         .add_systems(Update, move_entities)
-        .run()
+        .run();
 }
 
 #[derive(Component)]
@@ -116,14 +116,20 @@ fn setup(
     commands.spawn(Camera2dBundle::default());
 
     let boid_mesh = meshes.add(RegularPolygon::new(5., 3));
-    let boid_material = materials.add(Color::ANTIQUE_WHITE);
+    let boid_material = materials.add(ColorMaterial {
+        color: ANTIQUE_WHITE.into(),
+        ..default()
+    });
 
     // First boid in red, so we can follow it easily
     commands.spawn((
         BoidEntity(0),
         MaterialMesh2dBundle {
             mesh: Mesh2dHandle(boid_mesh.clone()),
-            material: materials.add(Color::ORANGE_RED),
+            material: materials.add(ColorMaterial {
+                color: ORANGE_RED.into(),
+                ..default()
+            }),
             ..Default::default()
         },
     ));

@@ -15,12 +15,11 @@ use bevy::render::render_resource::{
     PipelineCacheError, Shader, ShaderDefVal, ShaderImport, Source,
 };
 use bevy::render::renderer::RenderDevice;
+use bevy::render::settings::WgpuSettings;
 use bevy::utils::{Entry, HashMap, HashSet};
-use naga::valid::Capabilities;
+use naga::valid::{Capabilities, ShaderStages};
 use parking_lot::Mutex;
-use wgpu::{
-    Features, PipelineLayout, PipelineLayoutDescriptor, PushConstantRange, ShaderModuleDescriptor,
-};
+use wgpu::{Features, PipelineCompilationOptions, PipelineLayout, PipelineLayoutDescriptor, PushConstantRange, ShaderModuleDescriptor, ShaderSource};
 
 pub struct CachedAppPipeline {
     state: CachedPipelineState,
@@ -60,7 +59,7 @@ struct ShaderCache {
 
 impl ShaderCache {
     fn new(render_device: &RenderDevice) -> Self {
-        const CAPABILITIES: &[(Features, Capabilities)] = &[
+        const CAPABILITIES: &[(wgpu::Features, Capabilities)] = &[
             (Features::PUSH_CONSTANTS, Capabilities::PUSH_CONSTANT),
             (Features::SHADER_F64, Capabilities::FLOAT64),
             (
@@ -93,7 +92,7 @@ impl ShaderCache {
         #[cfg(not(debug_assertions))]
         let composer = naga_oil::compose::Composer::non_validating();
 
-        let composer = composer.with_capabilities(capabilities);
+        let composer = composer.with_capabilities(capabilities, ShaderStages::COMPUTE);
 
         Self {
             composer,
@@ -219,7 +218,7 @@ impl ShaderCache {
                             },
                         )?;
 
-                        wgpu::ShaderSource::Naga(Cow::Owned(naga))
+                        ShaderSource::Naga(Cow::Owned(naga))
                     }
                 };
 
@@ -459,6 +458,7 @@ impl AppPipelineCache {
             layout,
             module: &compute_module,
             entry_point: descriptor.entry_point.as_ref(),
+            compilation_options: PipelineCompilationOptions::default()
         };
 
         let pipeline = self.device.create_compute_pipeline(&descriptor);

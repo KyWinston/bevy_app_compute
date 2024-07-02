@@ -10,7 +10,7 @@ use bevy::{
     utils::HashMap,
 };
 use bytemuck::{bytes_of, cast_slice, from_bytes, AnyBitPattern, NoUninit};
-use wgpu::{BindGroupEntry, CommandEncoder, ComputePassDescriptor};
+use wgpu::{BindGroupEntry, CommandEncoder, ComputePassDescriptor, MaintainResult, MapMode};
 
 use crate::{
     error::{Error, Result},
@@ -202,7 +202,7 @@ impl<W: ComputeWorker> AppComputeWorker<W> {
         for (_, staging_buffer) in self.staging_buffers.iter_mut() {
             let read_buffer_slice = staging_buffer.buffer.slice(..);
 
-            read_buffer_slice.map_async(wgpu::MapMode::Read, move |result| {
+            read_buffer_slice.map_async(MapMode::Read, move |result| {
                 let err = result.err();
                 if err.is_some() {
                     let some_err = err.unwrap();
@@ -318,8 +318,8 @@ impl<W: ComputeWorker> AppComputeWorker<W> {
             .wgpu_device()
             .poll(wgpu::MaintainBase::Wait)
         {
-            wgpu::MaintainResult::SubmissionQueueEmpty => true,
-            wgpu::MaintainResult::Ok => false,
+            MaintainResult::SubmissionQueueEmpty => true,
+            MaintainResult::Ok => false,
         }
     }
     /// Check if the worker is ready to be read from.
