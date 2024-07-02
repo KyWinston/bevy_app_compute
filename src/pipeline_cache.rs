@@ -19,7 +19,10 @@ use bevy::render::settings::WgpuSettings;
 use bevy::utils::{Entry, HashMap, HashSet};
 use naga::valid::{Capabilities, ShaderStages};
 use parking_lot::Mutex;
-use wgpu::{Features, PipelineCompilationOptions, PipelineLayout, PipelineLayoutDescriptor, PushConstantRange, ShaderModuleDescriptor, ShaderSource};
+use wgpu::{
+    Features, PipelineCompilationOptions, PipelineLayout, PipelineLayoutDescriptor,
+    PushConstantRange, ShaderModuleDescriptor, ShaderSource,
+};
 
 pub struct CachedAppPipeline {
     state: CachedPipelineState,
@@ -69,6 +72,10 @@ impl ShaderCache {
             (
                 wgpu::Features::SAMPLED_TEXTURE_AND_STORAGE_BUFFER_ARRAY_NON_UNIFORM_INDEXING,
                 Capabilities::SAMPLED_TEXTURE_AND_STORAGE_BUFFER_ARRAY_NON_UNIFORM_INDEXING,
+            ),
+            (
+                wgpu::Features::TEXTURE_BINDING_ARRAY,
+                Capabilities::CUBE_ARRAY_TEXTURES,
             ),
             (
                 wgpu::Features::SAMPLED_TEXTURE_AND_STORAGE_BUFFER_ARRAY_NON_UNIFORM_INDEXING,
@@ -458,7 +465,7 @@ impl AppPipelineCache {
             layout,
             module: &compute_module,
             entry_point: descriptor.entry_point.as_ref(),
-            compilation_options: PipelineCompilationOptions::default()
+            compilation_options: PipelineCompilationOptions::default(),
         };
 
         let pipeline = self.device.create_compute_pipeline(&descriptor);
