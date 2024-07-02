@@ -15,7 +15,7 @@ use bevy::render::render_resource::{
     PipelineCacheError, Shader, ShaderDefVal, ShaderImport, Source,
 };
 use bevy::render::renderer::RenderDevice;
-use bevy::render::settings::WgpuSettings;
+use bevy::render::settings::WgpuFeatures;
 use bevy::utils::{Entry, HashMap, HashSet};
 use naga::valid::{Capabilities, ShaderStages};
 use parking_lot::Mutex;
@@ -62,7 +62,7 @@ struct ShaderCache {
 
 impl ShaderCache {
     fn new(render_device: &RenderDevice) -> Self {
-        const CAPABILITIES: &[(wgpu::Features, Capabilities)] = &[
+        const CAPABILITIES: &[(WgpuFeatures, Capabilities)] = &[
             (Features::PUSH_CONSTANTS, Capabilities::PUSH_CONSTANT),
             (Features::SHADER_F64, Capabilities::FLOAT64),
             (
