@@ -13,34 +13,18 @@ categories = ["game-development"]
 
 
 [dependencies]
-bevy = { version = "0.14.0-rc.4", features = [
-    "bevy_asset",         # Assets management
-    "bevy_scene",         # Scenes management
-    "bevy_core_pipeline",
-    "bevy_render",
-    "bevy_winit",         # Window management (cross-platform Winit backend)
-    "bevy_pbr",
-    "wgpu_trace",
-    "tonemapping_luts",
-] }
+bevy = "0.14.0-rc.4"
 parking_lot = "0.12.3"
 bytemuck = "1.16.0"
 naga = { version = "0.20.0", features = ["wgsl-in"] }
-naga_oil = { version = "0.14.*", default-features = false }
+naga_oil = { version = "0.14.0", default-features = false, feature = [
+    "test_shadder",
+] }
 wgpu = { version = "0.20.1", features = ["naga"] }
 
 [dev-dependencies]
 rand = "0.8.5"
-bevy = { version = "0.14.0-rc.4", features = [
-    "bevy_asset",         # Assets management
-    "bevy_scene",         # Scenes management
-    "bevy_core_pipeline",
-    "bevy_render",
-    "bevy_winit",         # Window management (cross-platform Winit backend)
-    "bevy_pbr",
-    "wgpu_trace",
-    "tonemapping_luts",
-] }
+bevy = { version = "0.14.0-rc.4", features = ["wayland"] }
 
 [[example]]
 name = "simple"
